@@ -18,7 +18,7 @@ namespace TelegramBot.Commands
             CommandText = "/poembuttons";
         }
 
-        public void AddCallBack(long ChatId)
+        public void AddCallBack(Conversation chat)
         {
             this.botClient.OnCallbackQuery -= Bot_Callback;
             this.botClient.OnCallbackQuery += Bot_Callback;

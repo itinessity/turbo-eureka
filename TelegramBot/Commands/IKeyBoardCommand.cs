@@ -10,7 +10,7 @@ namespace TelegramBot.Commands
     {
         InlineKeyboardMarkup ReturnKeyBoard();
 
-        void AddCallBack(long chatid);
+        void AddCallBack(Conversation chat);
 
         string InformationalMessage();
 

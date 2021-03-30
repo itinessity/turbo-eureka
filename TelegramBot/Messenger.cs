@@ -22,11 +22,29 @@ namespace TelegramBot
         {
             parser.AddCommand(new SayHiCommand());
             parser.AddCommand(new PoemButtonCommand(botClient));
+            parser.AddCommand(new AddWordCommand(botClient));
+            parser.AddCommand(new DeleteWordCommand());
+            parser.AddCommand(new TrainingCommand(botClient));
+            parser.AddCommand(new StopTrainingCommand());
         }
 
         public async Task MakeAnswer(Conversation chat)
         {
             var lastmessage = chat.GetLastMessage();
+
+            if (chat.IsTraningInProcess && !parser.IsTextCommand(lastmessage))
+            {
+                parser.ContinueTraining(lastmessage, chat);
+
+                return;
+            }
+
+            if (chat.IsAddingInProcess)
+            {
+                parser.NextStage(lastmessage, chat);
+
+                return;
+            }
 
             if (parser.IsMessageCommand(lastmessage))
             {
@@ -38,6 +56,7 @@ namespace TelegramBot
 
                 await SendText(chat, text);
             }
+
         }
 
 
@@ -45,7 +64,7 @@ namespace TelegramBot
         {
             if (parser.IsTextCommand(command))
             {
-                var text = parser.GetMessageText(command);
+                var text = parser.GetMessageText(command, chat);
 
                 await SendText(chat, text);
             }
@@ -54,10 +73,16 @@ namespace TelegramBot
             {
                 var keys = parser.GetKeyBoard(command);
                 var text = parser.GetInformationalMeggase(command);
-                parser.AddCallback(command, chat.GetId());
+                parser.AddCallback(command, chat);
 
                 await SendTextWithKeyBoard(chat, text, keys);
 
+            }
+           
+            if(parser.IsAddingCommand(command))
+            {
+                chat.IsAddingInProcess = true; 
+                parser.StartAddingWord(command, chat);
             }
         }
 

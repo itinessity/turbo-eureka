@@ -4,7 +4,7 @@
     {
         public string CommandText;
 
-        public bool CheckMessage(string message)
+        public virtual bool CheckMessage(string message)
         {
             return CommandText == message;
         }
